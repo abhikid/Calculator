@@ -1,0 +1,45 @@
+// Prisma schema for the Advanced Calculator App
+// Uses SQLite for local development; swap datasource url to PostgreSQL for production
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+// Connection URL is configured in prisma.config.ts (Prisma v7 requirement)
+datasource db {
+  provider = "sqlite"
+}
+
+model HistoryEntry {
+  id         String   @id @default(cuid())
+  expression String
+  result     String
+  mode       String   // 'standard' | 'scientific' | 'programmer'
+  angleUnit  String?  // 'deg' | 'rad', null for non-scientific
+  sessionId  String?
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([sessionId])
+}
+
+// Key-value store for preferences so new keys can be added without migrations
+model Preference {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String   // JSON-serialized value
+  updatedAt DateTime @updatedAt
+}
+
+model Formula {
+  id          String   @id @default(cuid())
+  name        String
+  expression  String
+  description String?
+  tags        String?  // JSON array stored as string (SQLite limitation)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([name])
+}

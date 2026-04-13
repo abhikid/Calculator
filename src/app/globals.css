@@ -1,26 +1,143 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ── Dark mode via class (next-themes adds .dark to <html>) ──────────────── */
+@custom-variant dark (&:is(.dark *));
 
+/* ── Design tokens ───────────────────────────────────────────────────────── */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Fonts */
+  --font-sans: var(--font-geist-sans, ui-sans-serif, system-ui, sans-serif);
+  --font-mono: var(--font-geist-mono, ui-monospace, monospace);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ── Light mode CSS variables ────────────────────────────────────────────── */
+:root {
+  --color-accent:       #f97316;
+  --color-accent-light: #fb923c;
+  --color-accent-dark:  #ea580c;
+
+  --color-btn-digit:    rgba(255,255,255,0.85);
+  --color-btn-op:       rgba(249,115,22,0.90);
+  --color-btn-fn:       rgba(209,213,219,0.80);
+  --color-btn-eq:       rgba(249,115,22,1.00);
+  --color-btn-clear:    rgba(239,68,68,0.85);
+  --color-btn-mem:      rgba(99,102,241,0.75);
+
+  --color-bg-page:    #ece9e4;
+  --color-bg-shell:   rgba(255,255,255,0.55);
+  --color-bg-display: rgba(255,255,255,0.40);
+  --color-bg-panel:   rgba(255,255,255,0.70);
+
+  --color-text-primary:   #111827;
+  --color-text-secondary: #6b7280;
+  --color-text-dim:       #9ca3af;
+
+  --color-border: rgba(0,0,0,0.08);
+  --blur-glass: 24px;
+}
+
+/* ── Dark mode ───────────────────────────────────────────────────────────── */
+.dark {
+  --color-btn-digit:    rgba(45,50,62,0.90);
+  --color-btn-op:       rgba(234,88,12,0.90);
+  --color-btn-fn:       rgba(60,65,80,0.85);
+  --color-btn-eq:       rgba(249,115,22,1.00);
+  --color-btn-clear:    rgba(220,38,38,0.85);
+  --color-btn-mem:      rgba(79,70,229,0.80);
+
+  --color-bg-page:    #111114;
+  --color-bg-shell:   rgba(22,22,28,0.80);
+  --color-bg-display: rgba(0,0,0,0.50);
+  --color-bg-panel:   rgba(22,22,28,0.85);
+
+  --color-text-primary:   #f9fafb;
+  --color-text-secondary: #9ca3af;
+  --color-text-dim:       #6b7280;
+
+  --color-border: rgba(255,255,255,0.07);
+}
+
+/* ── Base styles ─────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  height: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-bg-page);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  min-height: 100dvh;
+  /* Subtle radial gradient for depth */
+  background-image:
+    radial-gradient(ellipse at 25% 15%, rgba(249,115,22,0.10) 0%, transparent 55%),
+    radial-gradient(ellipse at 75% 85%, rgba(99,102,241,0.07) 0%, transparent 55%);
+  transition: background-color 200ms ease;
 }
+
+/* ── Scrollbar ───────────────────────────────────────────────────────────── */
+::-webkit-scrollbar        { width: 4px; height: 4px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  { background: rgba(156,163,175,0.35); border-radius: 9999px; }
+.dark ::-webkit-scrollbar-thumb { background: rgba(75,85,99,0.45); }
+
+/* ── Glass surface ───────────────────────────────────────────────────────── */
+.glass {
+  background: var(--color-bg-shell);
+  backdrop-filter: blur(var(--blur-glass));
+  -webkit-backdrop-filter: blur(var(--blur-glass));
+  border: 1px solid var(--color-border);
+}
+
+/* ── Button press feedback ───────────────────────────────────────────────── */
+.btn-press {
+  transition: transform 80ms ease-out, opacity 80ms ease-out;
+}
+.btn-press:active {
+  transform: scale(0.91);
+  opacity: 0.85;
+}
+
+/* ── Expression display — horizontal scroll, hidden scrollbar ────────────── */
+.expression-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  scrollbar-width: none;
+  direction: rtl;  /* keeps latest characters in view */
+}
+.expression-scroll > * {
+  direction: ltr;
+}
+.expression-scroll::-webkit-scrollbar { display: none; }
+
+/* ── Animations ──────────────────────────────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0);   }
+}
+.animate-fade-in { animation: fadeIn 180ms ease-out both; }
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+.animate-slide-up { animation: slideUp 220ms ease-out both; }
+
+@keyframes numPop {
+  0%   { transform: scale(0.94); opacity: 0.6; }
+  60%  { transform: scale(1.04); opacity: 1; }
+  100% { transform: scale(1.00); opacity: 1; }
+}
+.animate-num-pop { animation: numPop 200ms cubic-bezier(0.175,0.885,0.32,1.275) both; }
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0);    }
+}
+.animate-slide-in-right { animation: slideInRight 220ms ease-out both; }
